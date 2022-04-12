@@ -1,8 +1,11 @@
-from django.urls import path
+from django.urls import include, path, re_path
 from . import views
+from rest_framework import routers
+
+router = routers.SimpleRouter(trailing_slash=False)
+router.register(r'data/?', views.ContactVewSet)
 
 urlpatterns = [
+    path("api/", include(router.urls)),
     path('', views.em_index),
-    path('data/', views.data),
-    path('data/<int:id>', views.data_post),
 ]

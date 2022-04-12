@@ -4,6 +4,9 @@
 	<title>Datatable Demo</title>
 	<script type="text/javascript" src="//cdn.webix.com/edge/webix.js"></script>
 	<link rel="stylesheet" type="text/css" href="//cdn.webix.com/edge/webix.css">
+	{% load static %}
+	<script type="text/javascript" src="{% static 'emailer/js/routie.min.js' %}"" ></script>
+	
 </head>
 <body>
 
@@ -12,6 +15,9 @@
 
 
 <script type="text/javascript">
+
+	var rest = webix.proxy("rest", "./api/data/");
+
 	var header = {
 			view:"toolbar",
 			id:"myToolbar",
@@ -22,24 +28,19 @@
 			};
 
 	var table = {
-		view:"datatable", id:"d1",
-		columns:[
-			{ id:"first_name", editor:"text", sort:"string" },
-			{ id:"last_name", editor:"text", sort:"string" },
-			{ id:"email", editor:"text", sort:"string" },
-			{ id:"company_name", editor:"text", sort:"string" }
-		],
+		view:"datatable", 
+		id:"d1",
+		autoConfig:true,
 		select:"row",
-		datatype: "json",
 	    rules:{
 			first_name: webix.rules.isNotEmpty,
 			email: webix.rules.isEmail
     	},
 		editable:true,
 		editaction:"dblclick",
-		url:"./data/",
+		url:rest,
 		save: {
-			url: "rest->./data/",
+			url: rest,
 			on:{
 					onAfterSaveError:function(id,status,response, details){
 						webix.message({type: "error", text: "Email with Id = " + id + "has could not be updated" + status + " and " + response});
