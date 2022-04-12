@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Datatable Demo</title>
+	<script type="text/javascript" src="//cdn.webix.com/edge/webix.js"></script>
+	<link rel="stylesheet" type="text/css" href="//cdn.webix.com/edge/webix.css">
+</head>
+<body>
+
+
+{% csrf_token %}
+
+
+<script type="text/javascript">
+	var header = {
+			view:"toolbar",
+			id:"myToolbar",
+			cols:[
+				{ view:"button", id:"LoadBut", value:"Load", width:100, align:"left" },
+				{ view:"button", value:"Save", width:100, align:"center" },
+				{ view:"button", value:"Info", width:100, align:"right" }]	
+			};
+
+	var table = {
+		view:"datatable", id:"d1",
+		columns:[
+			{ id:"first_name", editor:"text", sort:"string" },
+			{ id:"last_name", editor:"text", sort:"string" },
+			{ id:"email", editor:"text", sort:"string" },
+			{ id:"company_name", editor:"text", sort:"string" }
+		],
+		select:"row",
+		datatype: "json",
+	    rules:{
+			first_name: webix.rules.isNotEmpty,
+			email: webix.rules.isEmail
+    	},
+		editable:true,
+		editaction:"dblclick",
+		url:"./data/",
+		save: {
+			url: "rest->./data/",
+			on:{
+					onAfterSaveError:function(id,status,response, details){
+						webix.message({type: "error", text: "Email with Id = " + id + "has could not be updated" + status + " and " + response});
+					}
+			}		
+		},
+		on:{
+			onValidationError:function(id){
+				webix.message({type: "error", text: "Email with Id = " + id + " is not correct!"});
+  			}
+		}
+	};
+
+	var buttons = {
+		view:"toolbar", 
+		cols:[
+			{ gravity:2 },
+			{ view:"button", value:"Add", click:function(){
+				$$("d1").add({ 
+					title:"New row",
+					first_name:"Hello", last_name:"World", email:"0@1.com", comment: "Nil"
+				});
+			}},
+			{ view:"button", value:"Remove", click:function(){
+				$$("d1").remove($$("d1").getSelectedId());
+			}}
+		]
+	};
+
+	webix.attachEvent("onBeforeAjax", function(mode, url, data, xhr, headers){
+		var key = document.querySelector("[name=csrfmiddlewaretoken]").value;
+		headers["X-CSRFToken"] = key;
+	});
+
+
+	webix.ui({
+		rows:[header, table, buttons]
+	});
+
+</script>
+</body>
+</html>
