@@ -18,6 +18,12 @@
 
 	var rest = webix.proxy("rest", "./api/data/");
 
+	var text_area = {
+		view: "textarea",
+		name: "Import email list",
+		value: "paste the list here"
+	};
+
 	var header = {
 			view:"toolbar",
 			id:"myToolbar",
@@ -30,7 +36,16 @@
 	var table = {
 		view:"datatable", 
 		id:"d1",
-		autoConfig:true,
+		columns:[
+			{ id:"company_name", header: ["Company", {content:"textFilter"}]},
+			{ id:"first_name", header: "Name"},
+			{ id:"last_name", header: "Last name"},
+			{ id:"email", editor: "text"},
+			{ id:"is_charterer", header:"Charterer", template:"{common.checkbox()}" },
+			{ id:"is_broker", header:"Broker", template:"{common.checkbox()}" },
+			{ id:"is_owner", header:"Owner", template:"{common.checkbox()}" },
+			{ id:"comment"}
+    	],		
 		select:"row",
 	    rules:{
 			first_name: webix.rules.isNotEmpty,
@@ -50,7 +65,7 @@
 		on:{
 			onValidationError:function(id){
 				webix.message({type: "error", text: "Email with Id = " + id + " is not correct!"});
-  			}
+  			},
 		}
 	};
 
@@ -61,7 +76,7 @@
 			{ view:"button", value:"Add", click:function(){
 				$$("d1").add({ 
 					title:"New row",
-					first_name:"Hello", last_name:"World", email:"0@1.com", comment: "Nil"
+					first_name:"Hello", last_name:"World", email:"0@1.com", comment: "Nil", company_name: "Unknown"
 				});
 			}},
 			{ view:"button", value:"Remove", click:function(){
@@ -75,9 +90,19 @@
 		headers["X-CSRFToken"] = key;
 	});
 
-
 	webix.ui({
 		rows:[header, table, buttons]
+	});
+
+	$$("d1").attachEvent("onAfterEditStop", function(state, editor, ignoreUpdate){
+    if(state.value != state.old){
+        webix.message("Cell value was changed to "+editor.getValue());
+		var tmp = state.value.toLowerCase();
+		$$("d1").updateItem(editor.row, {email: tmp});
+		$$("d1").refresh(editor.row);
+		// this.getFormView().save();
+		for (key in editor) {console.log(key)};
+    	}  
 	});
 
 </script>
