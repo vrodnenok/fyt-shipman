@@ -4,9 +4,13 @@
 	<title>Datatable Demo</title>
 	<script type="text/javascript" src="//cdn.webix.com/edge/webix.js"></script>
 	<link rel="stylesheet" type="text/css" href="//cdn.webix.com/edge/webix.css">
+	{% load static %}
+	<script data-main = "{% static '/js/index.js' %}" src="{% static '/js/require.js' %}"> </script>
 </head>
 <body>
-{% csrf_token %}
+	
+	{% csrf_token %}
+	<div id="app"></div>
 
 </body>
 </html>
